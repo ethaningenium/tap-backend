@@ -1,14 +1,13 @@
 package jwt
 
 import (
+	"tap/cfg"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-var secretKey = []byte("your-secret-key")
-
-
+var secretKey = cfg.JwtKey()
 
 func CreateAccessToken(email string) (string, error) {
 	// Создаем новый токен

@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"tap/cfg"
 	"tap/internal/handlers"
 	repo "tap/internal/repositories"
 	"tap/internal/routes"
@@ -16,11 +17,18 @@ import (
 )
 
 func main() {
+	//Config
+	err := cfg.InitConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Create a Fiber app
 	app := fiber.New()
 
 	// Connect to MongoDB
-	clientOptions := options.Client().ApplyURI("mongodb+srv://ethanham:a1a2b3b4@app.o2dc26k.mongodb.net/")
+	connectionUrl := cfg.DB()
+	clientOptions := options.Client().ApplyURI(connectionUrl)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -48,5 +56,6 @@ func main() {
 	routes.SetupRoutes(app, handler)
 
 	// Start server
-	log.Fatal(app.Listen(":3000"))
+	port := cfg.Port()
+	log.Fatal(app.Listen(port))
 }
