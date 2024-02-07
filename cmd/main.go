@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -25,18 +26,22 @@ func main() {
 
 	// Create a Fiber app
 	app := fiber.New()
+	app.Use(logger.New(logger.Config{
+    Format: "[${ip}]:${port} ${status} - ${method} ${path} ${latency}\n",
+	}))
+	//sss
 
 	// Connect to MongoDB
 	connectionUrl := cfg.DB()
 	clientOptions := options.Client().ApplyURI(connectionUrl)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	defer client.Disconnect(context.TODO())
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	fmt.Println("Connected to MongoDB!")
 

@@ -2,6 +2,7 @@ package cfg
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -32,6 +33,8 @@ func InitConfig() error {
 	if port == "" || dburl == "" || jwtSecret == "" {
 		return errors.New("Error loading .env variables")
 	}
+
+	fmt.Println(config)
 
 	return nil
 }

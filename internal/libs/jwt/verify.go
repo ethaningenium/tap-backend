@@ -1,6 +1,9 @@
 package jwt
 
 import (
+	"errors"
+	"tap/cfg"
+
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -11,12 +14,13 @@ type TokenClaims struct {
 }
 
 func VerifyToken(tokenString string) (*TokenClaims, error) {
+	var secretKey = []byte(cfg.JwtKey())
 	// Разбираем токен и проверяем его подпись
 	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return secretKey, nil
 	})
 	if err != nil {
-			return nil, err
+			return nil, errors.New("Invalid token")
 	}
 
 	// Проверяем, действителен ли токен

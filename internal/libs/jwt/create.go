@@ -1,15 +1,17 @@
 package jwt
 
 import (
+	"fmt"
 	"tap/cfg"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-var secretKey = cfg.JwtKey()
+
 
 func CreateAccessToken(email string) (string, error) {
+	var secretKey = []byte(cfg.JwtKey())
 	// Создаем новый токен
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Устанавливаем клеймы (payload) токена
@@ -27,6 +29,7 @@ func CreateAccessToken(email string) (string, error) {
 }
 
 func CreateRefreshToken(email string) (string, error) {
+	var secretKey = []byte(cfg.JwtKey())
 	// Создаем новый токен
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Устанавливаем клеймы (payload) токена
@@ -37,6 +40,7 @@ func CreateRefreshToken(email string) (string, error) {
 	// Подписываем токен с использованием секретного ключа
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
+			fmt.Println("Error creating refresh token: ", secretKey)
 			return "", err
 	}
 

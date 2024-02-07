@@ -76,3 +76,22 @@ func (repo *UserRepo) SetNewRefreshToken(email string, refreshToken string) erro
 	}
 	return nil
 }
+
+func (repo *UserRepo) GetUserByRefreshToken(refreshToken string) (m.UserRegisterRequest, error) {
+	var user m.UserRegisterRequest
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := repo.coll.FindOne(ctx, bson.M{"refreshtoken": refreshToken}).Decode(&user)
+	if err != nil {
+			if err == mongo.ErrNoDocuments {
+					// Пользователь с указанным email не найден
+					return m.UserRegisterRequest{}, errors.New("user not found")
+			}
+			// Произошла ошибка при выполнении запроса к базе данных
+			return m.UserRegisterRequest{}, err
+	}
+	
+	return user, nil
+}
