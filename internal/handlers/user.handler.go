@@ -72,14 +72,14 @@ func (h *Handler) Login( c *fiber.Ctx) error {
 }
 
 func (h *Handler) Getme( c *fiber.Ctx) error {
-	refshrefToken := c.Cookies("refresh_token")
-	_ , err := jwt.VerifyToken(refshrefToken)
+	refreshToken := c.Cookies("refresh_token")
+	_ , err := jwt.VerifyToken(refreshToken)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": "Invalid token",
 		})
 	}
-	email, name, accessToken, err := h.service.Getme(refshrefToken)
+	email, name, accessToken, err := h.service.Getme(refreshToken)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": err,
@@ -91,3 +91,4 @@ func (h *Handler) Getme( c *fiber.Ctx) error {
 		"name": name,
 	})
 }
+

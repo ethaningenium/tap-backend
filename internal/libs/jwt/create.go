@@ -10,13 +10,13 @@ import (
 
 
 
-func CreateAccessToken(email string) (string, error) {
+func CreateAccessToken(id string) (string, error) {
 	var secretKey = []byte(cfg.JwtKey())
 	// Создаем новый токен
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Устанавливаем клеймы (payload) токена
 	claims := token.Claims.(jwt.MapClaims)
-	claims["email"] = email
+	claims["id"] = id
 	claims["exp"] = time.Now().Add(time.Hour).Unix() // Токен действителен в течение 24 часов
 
 	// Подписываем токен с использованием секретного ключа

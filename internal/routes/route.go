@@ -2,10 +2,16 @@ package routes
 
 import (
 	"tap/internal/handlers"
+	middle "tap/internal/middlewares"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+type User struct {
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
 
 func SetupRoutes (app *fiber.App, handlers *handlers.Handler) {
 	app.Post("/register", handlers.Register)
@@ -20,5 +26,7 @@ func SetupRoutes (app *fiber.App, handlers *handlers.Handler) {
 		})
 		return c.SendString("Hello, World!")
 	})
+	app.Get("/page/:address", handlers.GetPage)
+	app.Post("/page",middle.CheckAuth,  handlers.CreatePage)
 	// TODO
 }
