@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) Register( c *fiber.Ctx) error {
-	var user m.UserRegister
+	var user m.RegisterBody
 
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -41,7 +41,7 @@ func (h *Handler) Register( c *fiber.Ctx) error {
 
 
 func (h *Handler) Login( c *fiber.Ctx) error {
-	var user m.UserLogin
+	var user m.LoginBody
 
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -49,7 +49,7 @@ func (h *Handler) Login( c *fiber.Ctx) error {
 		})
 	}
 
-	name, refreshToken, accessToken, err := h.service.Login(user.Email, user.Password)
+	name, refreshToken, accessToken, err := h.service.Login(user)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": err.Error(),

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"tap/internal/libs/primitive"
 	m "tap/internal/models"
 )
 
@@ -8,6 +9,34 @@ func (s *Service) GetPageByAddress(address string) (m.PageRequest, error) {
 	return s.repo.Pages.GetByAddress(address)
 }
 
-func (s *Service) CreatePage(page m.PageRequest) error {
-	return s.repo.Pages.CreateNewPage(page)
+func (s *Service) CreatePage(page m.PageFromBody, userId string) error {
+	HexId, err := primitive.GetObject(userId)
+	if err != nil {
+		return err
+	}
+	requestPage := m.PageRequest{
+		ID: page.ID,
+		Title: page.Title,
+		Address: page.Address,
+		Bricks: page.Bricks,
+		User: HexId,
+	}
+	
+	return s.repo.Pages.CreateNewPage(requestPage)
+}
+
+func (s *Service) UpdatePage(page m.PageFromBody, userId string) error {
+	HexId, err := primitive.GetObject(userId)
+	if err != nil {
+		return err
+	}
+	requestPage := m.PageRequest{
+		ID: page.ID,
+		Title: page.Title,
+		Address: page.Address,
+		Bricks: page.Bricks,
+		User: HexId,
+	}
+	
+	return s.repo.Pages.UpdatePage(requestPage)
 }

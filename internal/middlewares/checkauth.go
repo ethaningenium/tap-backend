@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func CheckAuth(c *fiber.Ctx) error {
+func Auth(c *fiber.Ctx) error {
 	accessToken := c.Get("access_token")
 	if accessToken == "" {
 		return c.Status(401).JSON(fiber.Map{

@@ -35,7 +35,7 @@ func NewUserRepo(db *mongo.Database) *UserRepo {
 }
 
 
-func (repo *UserRepo) CreateNewUser( user m.UserRegisterResponse )  (string ,error) {
+func (repo *UserRepo) CreateNewUser( user m.RegisterResponse )  (string ,error) {
 	_ , err := repo.coll.InsertOne(context.Background(), user)
   if err != nil {
         return "", errors.New("Error on create user")
@@ -44,8 +44,8 @@ func (repo *UserRepo) CreateNewUser( user m.UserRegisterResponse )  (string ,err
 	return user.ID.String(), nil
 }
 
-func (repo *UserRepo) GetUserByEmail(email string) (m.UserRegisterResponse, error) {
-	var user m.UserRegisterResponse
+func (repo *UserRepo) GetUserByEmail(email string) (m.RegisterResponse, error) {
+	var user m.RegisterResponse
 	
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -54,10 +54,10 @@ func (repo *UserRepo) GetUserByEmail(email string) (m.UserRegisterResponse, erro
 	if err != nil {
 			if err == mongo.ErrNoDocuments {
 					// Пользователь с указанным email не найден
-					return m.UserRegisterResponse{}, errors.New("user not found")
+					return m.RegisterResponse{}, errors.New("user not found")
 			}
 			// Произошла ошибка при выполнении запроса к базе данных
-			return m.UserRegisterResponse{}, err
+			return m.RegisterResponse{}, err
 	}
 	
 	return user, nil
@@ -78,8 +78,8 @@ func (repo *UserRepo) SetNewRefreshToken(email string, refreshToken string) erro
 	return nil
 }
 
-func (repo *UserRepo) GetUserByRefreshToken(refreshToken string) (m.UserRegisterResponse, error) {
-	var user m.UserRegisterResponse
+func (repo *UserRepo) GetUserByRefreshToken(refreshToken string) (m.RegisterResponse, error) {
+	var user m.RegisterResponse
 	
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -88,10 +88,10 @@ func (repo *UserRepo) GetUserByRefreshToken(refreshToken string) (m.UserRegister
 	if err != nil {
 			if err == mongo.ErrNoDocuments {
 					// Пользователь с указанным email не найден
-					return m.UserRegisterResponse{}, errors.New("user not found")
+					return m.RegisterResponse{}, errors.New("user not found")
 			}
 			// Произошла ошибка при выполнении запроса к базе данных
-			return m.UserRegisterResponse{}, err
+			return m.RegisterResponse{}, err
 	}
 	
 	return user, nil

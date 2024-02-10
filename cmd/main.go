@@ -18,6 +18,7 @@ import (
 )
 
 func main() {
+	defer fmt.Println("Bye!")
 	//Config
 	err := cfg.InitConfig()
 	if err != nil {

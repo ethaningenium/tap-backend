@@ -30,6 +30,16 @@ func NewPageRepo(db *mongo.Database) *PageRepo {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	indexModel = mongo.IndexModel{
+		Keys:    bson.M{"address": 1}, 
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err = database.Indexes().CreateOne(context.Background(), indexModel)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return &PageRepo{
 		coll: database,
 	}
