@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"tap/internal/libs/jwt"
+	v "tap/internal/libs/validate"
 	m "tap/internal/models"
 	"time"
 
@@ -15,6 +16,11 @@ func (h *Handler) Register( c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{
 			"message": "Error parsing body",
 		}) 
+	}
+	if err := v.Struct(user); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": err.Error(),
+		})
 	}
 
 	refreshToken , accessToken, err := h.service.Register(user)
@@ -48,6 +54,12 @@ func (h *Handler) Login( c *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
+	if err := v.Struct(user); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
 
 	name, refreshToken, accessToken, err := h.service.Login(user)
 	if err != nil {
@@ -73,13 +85,13 @@ func (h *Handler) Login( c *fiber.Ctx) error {
 
 func (h *Handler) Getme( c *fiber.Ctx) error {
 	refreshToken := c.Cookies("refresh_token")
-	_ , err := jwt.VerifyToken(refreshToken)
+	claims , err := jwt.VerifyRefresh(refreshToken)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": "Invalid token",
 		})
 	}
-	email, name, accessToken, err := h.service.Getme(refreshToken)
+	name, accessToken, err := h.service.Getme(claims.Email)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": err,
@@ -87,7 +99,7 @@ func (h *Handler) Getme( c *fiber.Ctx) error {
 	}
 	c.Set("access_token", accessToken)
 	return c.JSON(fiber.Map{
-		"email": email,
+		"email": claims.Email,
 		"name": name,
 	})
 }

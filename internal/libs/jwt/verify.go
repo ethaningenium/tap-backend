@@ -2,21 +2,28 @@ package jwt
 
 import (
 	"errors"
-	"tap/cfg"
+	"tap/config"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 
-type TokenClaims struct {
+type AccessClaims struct {
 	ID string `json:"id"`
+	Name string `json:"name"`
+	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
-func VerifyToken(tokenString string) (*TokenClaims, error) {
-	var secretKey = []byte(cfg.JwtKey())
+type RefreshClaims struct {
+	Email string `json:"email"`
+	jwt.StandardClaims
+}
+
+func VerifyAccess(accessToken string) (*AccessClaims, error) {
+	var secretKey = []byte(config.JWTKey())
 	// Разбираем токен и проверяем его подпись
-	token, err := jwt.ParseWithClaims(tokenString, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &AccessClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return secretKey, nil
 	})
 	if err != nil {
@@ -24,7 +31,26 @@ func VerifyToken(tokenString string) (*TokenClaims, error) {
 	}
 
 	// Проверяем, действителен ли токен
-	claims, ok := token.Claims.(*TokenClaims)
+	claims, ok := token.Claims.(*AccessClaims)
+	if !ok || !token.Valid {
+			return nil, jwt.ErrSignatureInvalid
+	}
+
+	return claims, nil
+}
+
+func VerifyRefresh(refreshToken string) (*RefreshClaims, error) {
+	var secretKey = []byte(config.JWTKey())
+	// Разбираем токен и проверяем его подпись
+	token, err := jwt.ParseWithClaims(refreshToken, &RefreshClaims{}, func(token *jwt.Token) (interface{}, error) {
+			return secretKey, nil
+	})
+	if err != nil {
+			return nil, errors.New("Invalid token")
+	}
+
+	// Проверяем, действителен ли токен
+	claims, ok := token.Claims.(*RefreshClaims)
 	if !ok || !token.Valid {
 			return nil, jwt.ErrSignatureInvalid
 	}

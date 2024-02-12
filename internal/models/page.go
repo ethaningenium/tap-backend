@@ -5,9 +5,9 @@ import (
 )
 
 type PageFromBody struct {
-	ID string `json:"id" bson:"page_id"`
-	Title string `json:"title" bson:"title"`
-	Address string `json:"address" bson:"address"`
+	ID string `json:"id" bson:"page_id" validate:"required"`
+	Title string `json:"title" bson:"title" validate:"required"`
+	Address string `json:"address" bson:"address" validate:"required"`
 	Bricks []Brick `json:"bricks" bson:"bricks"`
 }
 

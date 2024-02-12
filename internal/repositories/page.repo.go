@@ -14,7 +14,7 @@ import (
 )
 
 type PageRepo struct {
-	coll *mongo.Collection
+	*mongo.Collection
 }
 
 func NewPageRepo(db *mongo.Database) *PageRepo {
@@ -41,12 +41,12 @@ func NewPageRepo(db *mongo.Database) *PageRepo {
 		log.Fatal(err)
 	}
 	return &PageRepo{
-		coll: database,
+		database,
 	}
 }
 
 func (repo *PageRepo) CreateNewPage( page m.PageRequest ) error {
-	_, err := repo.coll.InsertOne(context.Background(), page)
+	_, err := repo.InsertOne(context.Background(), page)
 		if err != nil {
 				return err
 		}
@@ -54,7 +54,7 @@ func (repo *PageRepo) CreateNewPage( page m.PageRequest ) error {
 }
 
 func (repo *PageRepo) UpdatePage( page m.PageRequest ) error {
-	_, err := repo.coll.UpdateOne(context.Background(), bson.M{"page_id": page.ID}, bson.M{"$set": page})
+	_, err := repo.UpdateOne(context.Background(), bson.M{"page_id": page.ID}, bson.M{"$set": page})
 		if err != nil {
 				return errors.New("Error on update page")
 		}
@@ -63,7 +63,7 @@ func (repo *PageRepo) UpdatePage( page m.PageRequest ) error {
 
 func (repo *PageRepo) GetPagesByUserID( userID primitive.ObjectID ) ([]m.PageRequest, error) {
 	var pages []m.PageRequest
-	cursor, err := repo.coll.Find(context.Background(), bson.M{"user_id": userID})
+	cursor, err := repo.Find(context.Background(), bson.M{"user_id": userID})
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (repo *PageRepo) GetPagesByUserID( userID primitive.ObjectID ) ([]m.PageReq
 
 func (repo *PageRepo) GetPageByID( pageID string ) (m.PageRequest, error) {
 	var page m.PageRequest
-	err := repo.coll.FindOne(context.Background(), bson.M{"page_id": pageID}).Decode(&page)
+	err := repo.FindOne(context.Background(), bson.M{"page_id": pageID}).Decode(&page)
 	if err != nil {
 		return m.PageRequest{}, err
 	}
@@ -83,7 +83,7 @@ func (repo *PageRepo) GetPageByID( pageID string ) (m.PageRequest, error) {
 }
 
 func (repo *PageRepo) DeletePage( pageID string ) error {
-	_, err := repo.coll.DeleteOne(context.Background(), bson.M{"page_id": pageID})
+	_, err := repo.DeleteOne(context.Background(), bson.M{"page_id": pageID})
 		if err != nil {
 				return errors.New("Error on delete page")
 		}
@@ -92,7 +92,7 @@ func (repo *PageRepo) DeletePage( pageID string ) error {
 
 func (repo *PageRepo) GetByAddress( address string ) (m.PageRequest, error) {
 	var page m.PageRequest
-	err := repo.coll.FindOne(context.Background(), bson.M{"address": address}).Decode(&page)
+	err := repo.FindOne(context.Background(), bson.M{"address": address}).Decode(&page)
 	if err != nil {
 		return m.PageRequest{}, err
 	}

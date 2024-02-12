@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"tap/cfg"
+	"tap/config"
 	"tap/internal/handlers"
 	repo "tap/internal/repositories"
 	"tap/internal/routes"
@@ -18,9 +18,8 @@ import (
 )
 
 func main() {
-	defer fmt.Println("Bye!")
 	//Config
-	err := cfg.InitConfig()
+	err := config.InitConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,10 +29,9 @@ func main() {
 	app.Use(logger.New(logger.Config{
     Format: "[${ip}]:${port} ${status} - ${method} ${path} ${latency}\n",
 	}))
-	//sss
 
 	// Connect to MongoDB
-	connectionUrl := cfg.DB()
+	connectionUrl := config.ConnectionUrl()
 	clientOptions := options.Client().ApplyURI(connectionUrl)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -47,7 +45,7 @@ func main() {
 	fmt.Println("Connected to MongoDB!")
 
 	// Create a collection
-	database := client.Database("test1")
+	database := client.Database(config.DBName())
 
 	// Create a repository
 	repository := repo.NewRepository(database)
@@ -62,6 +60,6 @@ func main() {
 	routes.SetupRoutes(app, handler)
 
 	// Start server
-	port := cfg.Port()
+	port := config.Port()
 	log.Fatal(app.Listen(port))
 }

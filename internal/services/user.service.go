@@ -4,22 +4,15 @@ import (
 	"errors"
 	bc "tap/internal/libs/bcrypt"
 	jwt "tap/internal/libs/jwt"
+	"tap/internal/libs/random"
 	m "tap/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (s *Service) Register(user m.RegisterBody) ( refreshToken string , accessToken string,err error) {
-
-	refreshToken, err = jwt.CreateRefreshToken(user.Email)
-	if err != nil {
-		return "", "", errors.New("Error creating refresh token")
-	}
-
-	hashedPassword, err := bc.HashPassword(user.Password)
-	if err != nil {
-		return "", "", errors.New("Error hashing password")
-	}
+	refreshToken = jwt.CreateRefresh(user.Email)
+	hashedPassword := bc.HashPassword(user.Password)
 
 	userWithToken := m.RegisterResponse{
 		ID: primitive.NewObjectID(),
@@ -27,6 +20,7 @@ func (s *Service) Register(user m.RegisterBody) ( refreshToken string , accessTo
 		Email: user.Email,
 		Password: hashedPassword,
 		RefreshToken: refreshToken,
+		VerifyCode: random.GenerateRandomString(36),
 	}
 	
 	id, err := s.repo.Users.CreateNewUser(userWithToken)
@@ -34,11 +28,7 @@ func (s *Service) Register(user m.RegisterBody) ( refreshToken string , accessTo
 		return "", "", err
 	}
 
-	accessToken, err = jwt.CreateAccessToken(id)
-	if err != nil {
-		return "", "", errors.New("Error creating access token")
-	}
-
+	accessToken = jwt.CreateAccess(id, user.Name, user.Email)
 	return refreshToken, accessToken, nil
 }
 
@@ -47,17 +37,11 @@ func (s *Service) Login(user m.LoginBody) (name string ,refreshToken string , ac
 	if err != nil {
 		return "", "", "", errors.New("User not found")
 	}
-	if err := bc.CheckPasswordHash(user.Password, user.Password); err != nil {
+	if err := bc.CheckPasswordHash(user.Password, myUser.Password); err != nil {
 		return "", "", "", errors.New("Invalid password")
 	}
-	refreshToken, err = jwt.CreateRefreshToken(user.Email)
-	if err != nil {
-		return "", "", "", errors.New("Error creating refresh token")
-	}
-	accessToken, err = jwt.CreateAccessToken(myUser.ID.Hex())
-	if err != nil {
-		return "", "", "", errors.New("Error creating access token")
-	}
+	refreshToken = jwt.CreateRefresh(user.Email)
+	accessToken = jwt.CreateAccess(myUser.ID.Hex(), myUser.Name, myUser.Email)
 	err = s.repo.Users.SetNewRefreshToken(user.Email, refreshToken)
 	if err != nil {
 		return "", "", "", errors.New("Error setting refresh token")
@@ -65,14 +49,11 @@ func (s *Service) Login(user m.LoginBody) (name string ,refreshToken string , ac
 	return myUser.Name, refreshToken,accessToken, nil
 }
 
-func (s *Service) Getme(refreshToken string) (email string, name string, accessToken string , err error) {
-	user, err := s.repo.Users.GetUserByRefreshToken(refreshToken)
+func (s *Service) Getme(email string) (name string, accessToken string , err error) {
+	user, err := s.repo.Users.GetUserByEmail(email)
 	if err != nil {
-		return 	"", "", "", errors.New("User not found")
+		return  "", "", errors.New("User not found")
 	}
-	accessToken, err = jwt.CreateAccessToken(user.ID.Hex())
-	if err != nil {
-		return "", "", "", errors.New("Error creating access token")
-	}
-	return user.Email, user.Name, accessToken, nil
+	accessToken = jwt.CreateAccess(user.ID.Hex(), user.Name, user.Email)
+	return  user.Name, accessToken, nil
 }

@@ -1,8 +1,8 @@
 package jwt
 
 import (
-	"fmt"
-	"tap/cfg"
+	"log"
+	"tap/config"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -10,26 +10,28 @@ import (
 
 
 
-func CreateAccessToken(id string) (string, error) {
-	var secretKey = []byte(cfg.JwtKey())
+func CreateAccess(id string, email string, name string) (string) {
+	var secretKey = []byte(config.JWTKey())
 	// Создаем новый токен
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Устанавливаем клеймы (payload) токена
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = id
+	claims["email"] = email
+	claims["name"] = name
 	claims["exp"] = time.Now().Add(time.Hour).Unix() // Токен действителен в течение 24 часов
 
 	// Подписываем токен с использованием секретного ключа
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
-			return "", err
+			log.Fatal("Error creating access token: ", err)
 	}
 
-	return tokenString, nil
+	return tokenString
 }
 
-func CreateRefreshToken(email string) (string, error) {
-	var secretKey = []byte(cfg.JwtKey())
+func CreateRefresh(email string) (string) {
+	var secretKey = []byte(config.JWTKey())
 	// Создаем новый токен
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Устанавливаем клеймы (payload) токена
@@ -40,9 +42,8 @@ func CreateRefreshToken(email string) (string, error) {
 	// Подписываем токен с использованием секретного ключа
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
-			fmt.Println("Error creating refresh token: ", secretKey)
-			return "", err
+			log.Fatal("Error creating refresh token: ", err)
 	}
 
-	return tokenString, nil
+	return tokenString
 }

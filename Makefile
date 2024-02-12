@@ -3,3 +3,6 @@ run:
 
 watch:
 	cd cmd && ./air
+
+xpr:
+	go run exp/run.go
