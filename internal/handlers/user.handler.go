@@ -68,7 +68,16 @@ func (h *Handler) Login( c *fiber.Ctx) error {
 		})
 	}
 
-	c.Set("access_token", accessToken)
+	c.Set("token", "sdsdsd")
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "access_token",
+		Value:    accessToken,
+		Expires:  time.Now().Add(time.Hour),
+		HTTPOnly: true,
+	})
+
+	c.Set("Authorization", accessToken)
 
 	c.Cookie(&fiber.Cookie{
 		Name:     "refresh_token",

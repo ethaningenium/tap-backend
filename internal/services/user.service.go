@@ -40,9 +40,9 @@ func (s *Service) Login(user m.LoginBody) (name string ,refreshToken string , ac
 	if err := bc.CheckPasswordHash(user.Password, myUser.Password); err != nil {
 		return "", "", "", errors.New("Invalid password")
 	}
-	refreshToken = jwt.CreateRefresh(user.Email)
+	refreshToken = jwt.CreateRefresh(myUser.Email)
 	accessToken = jwt.CreateAccess(myUser.ID.Hex(), myUser.Name, myUser.Email)
-	err = s.repo.Users.SetNewRefreshToken(user.Email, refreshToken)
+	err = s.repo.Users.SetNewRefreshToken(myUser.Email, refreshToken)
 	if err != nil {
 		return "", "", "", errors.New("Error setting refresh token")
 	}

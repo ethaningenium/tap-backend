@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -29,6 +30,23 @@ func main() {
 	app.Use(logger.New(logger.Config{
     Format: "[${ip}]:${port} ${status} - ${method} ${path} ${latency}\n",
 	}))
+	app.Use(cors.New(cors.Config{
+    AllowOrigins: "*",
+		AllowHeaders: "*",
+		ExposeHeaders: "*",
+		MaxAge: 24 * 60 * 60,
+		AllowCredentials: true,
+		AllowMethods: "HEAD, GET, POST, PUT, PATCH, DELETE",
+		
+}))
+
+	app.Use (func(c *fiber.Ctx) error {
+		c.Set("X-Powered-By", "Fiber")
+		if c.Method() == "OPTIONS" {
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+		return c.Next()
+	})
 
 	// Connect to MongoDB
 	connectionUrl := config.ConnectionUrl()
