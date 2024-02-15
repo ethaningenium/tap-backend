@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"net/http"
 	jwt "tap/internal/libs/jwt"
@@ -10,36 +11,34 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (s *Service) AuthGoogle(token string) (accessToken string, refreshToken string, err error) {
-	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token)
+func (s *Service) AuthGoogle(googleToken string) (token string, err error) {
+	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + googleToken)
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
+	fmt.Println(googleToken)
 	defer resp.Body.Close()
 
 	var user map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
-		return  "", "", err
+		return  "", err
 	}
 
-
-	refreshToken = jwt.CreateRefresh(user["email"].(string))
-
+	fmt.Println(user)
 	userWithToken := m.RegisterResponse{
 		ID: primitive.NewObjectID(),
 		Name: user["name"].(string),
 		Email: user["email"].(string),
 		Password: "googleAuthUser",
-		RefreshToken: refreshToken,
 		IsEmailVerified: true,
 	}
 	id, err := s.repo.Users.CreateNewUser(userWithToken)
 	if err != nil {
 		if err.Error() != "User already exists"{
-			return "", "", err
+			return  "", err
 		}
 	}
 
-	accessToken = jwt.CreateAccess(id, user["email"].(string), user["name"].(string))
-	return refreshToken, accessToken, nil
+	token = jwt.Create(id, user["email"].(string), user["name"].(string))
+	return token, nil
 }

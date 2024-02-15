@@ -10,7 +10,7 @@ import (
 
 
 
-func CreateAccess(id string, email string, name string) (string) {
+func Create(id string, email string, name string) (string) {
 	var secretKey = []byte(config.JWTKey())
 	// Создаем новый токен
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -19,7 +19,7 @@ func CreateAccess(id string, email string, name string) (string) {
 	claims["id"] = id
 	claims["email"] = email
 	claims["name"] = name
-	claims["exp"] = time.Now().Add(time.Hour).Unix() // Токен действителен в течение 24 часов
+	claims["exp"] = time.Now().Add(time.Hour * 24 * 60).Unix() // Токен действителен в течение 24 часов
 
 	// Подписываем токен с использованием секретного ключа
 	tokenString, err := token.SignedString(secretKey)
@@ -30,20 +30,4 @@ func CreateAccess(id string, email string, name string) (string) {
 	return tokenString
 }
 
-func CreateRefresh(email string) (string) {
-	var secretKey = []byte(config.JWTKey())
-	// Создаем новый токен
-	token := jwt.New(jwt.SigningMethodHS256)
-	// Устанавливаем клеймы (payload) токена
-	claims := token.Claims.(jwt.MapClaims)
-	claims["email"] = email
-	claims["exp"] = time.Now().Add(time.Hour * 24 * 30).Unix() // Токен действителен в течение 24 часов
 
-	// Подписываем токен с использованием секретного ключа
-	tokenString, err := token.SignedString(secretKey)
-	if err != nil {
-			log.Fatal("Error creating refresh token: ", err)
-	}
-
-	return tokenString
-}

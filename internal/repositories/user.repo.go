@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -67,20 +68,30 @@ func (repo *UserRepo) GetUserByEmail(email string) (m.RegisterResponse, error) {
 	return user, nil
 }
 
+func (repo *UserRepo) GetOneByID(id string) (m.RegisterResponse, error) {
+	var user m.RegisterResponse
 
-func (repo *UserRepo) SetNewRefreshToken(email string, refreshToken string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := repo.UpdateOne(ctx, bson.M{"email": email}, bson.M{"$set": bson.M{"refreshtoken": refreshToken}})
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return m.RegisterResponse{}, err
+	}
+
+	err = repo.FindOne(ctx, bson.M{"_id": objectID}).Decode(&user)
 	if err != nil {
 			if err == mongo.ErrNoDocuments {
-					return errors.New("user not found")
+					// Пользователь с указанным email не найден
+					return m.RegisterResponse{}, errors.New("user not found")
 			}
-			return err
+			// Произошла ошибка при выполнении запроса к базе данных
+			return m.RegisterResponse{}, err
 	}
-	return nil
+	
+	return user, nil
 }
+
 
 func (repo *UserRepo) SetVerifiedTrue(verifyCode string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

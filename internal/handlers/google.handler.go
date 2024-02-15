@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -19,18 +19,16 @@ func (h *Handler) AuthGoogle (ctx *fiber.Ctx) error {
 func (h *Handler) AuthGoogleCallback (ctx *fiber.Ctx) error {
 	code := ctx.Query("code")
 	c := context.Background()
-	token, err := config.GoogleConfig().Exchange(c, code)
+	googleToken, err := config.GoogleConfig().Exchange(c, code)
 	if err != nil {
 		log.Println("Failed to exchange token:", err)
 		return ctx.Redirect(config.ClientHome(), fiber.StatusMovedPermanently)
 	}
-	_ , refreshToken, err := h.service.AuthGoogle(token.AccessToken)
-	ctx.Cookie(&fiber.Cookie{
-		Name:     "refresh_token",
-		Value:    refreshToken,
-		Expires:  time.Now().Add(time.Hour * 24 * 30),
-		HTTPOnly: true,
-	})
-	return ctx.Redirect(config.ClientHome(), fiber.StatusMovedPermanently)
+	token, err := h.service.AuthGoogle(googleToken.AccessToken)
+	if err != nil {
+		return ctx.Redirect(config.ClientHome(), fiber.StatusMovedPermanently)
+	}
+	
+	return ctx.Redirect(fmt.Sprintf("%s?token=%s", config.ClientHome(), token), fiber.StatusMovedPermanently)
 }
 

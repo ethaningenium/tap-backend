@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (s *Service) Register(user m.RegisterBody) ( refreshToken string , accessToken string,err error) {
-	refreshToken = jwt.CreateRefresh(user.Email)
+func (s *Service) Register(user m.RegisterBody) (token string,err error) {
+	
 	hashedPassword := bc.HashPassword(user.Password)
 
 	userWithToken := m.RegisterResponse{
@@ -19,41 +19,36 @@ func (s *Service) Register(user m.RegisterBody) ( refreshToken string , accessTo
 		Name: user.Name,
 		Email: user.Email,
 		Password: hashedPassword,
-		RefreshToken: refreshToken,
 		VerifyCode: random.GenerateRandomString(36),
 	}
 	
 	id, err := s.repo.Users.CreateNewUser(userWithToken)
 	if err != nil {
-		return "", "", err
+		return  "", err
 	}
 
-	accessToken = jwt.CreateAccess(id, user.Name, user.Email)
-	return refreshToken, accessToken, nil
+	token = jwt.Create(id, user.Name, user.Email)
+	return token, nil
 }
 
-func (s *Service) Login(user m.LoginBody) (name string ,refreshToken string , accessToken string,err error) {
+func (s *Service) Login(user m.LoginBody) (name string ,token string,err error) {
 	myUser, err := s.repo.Users.GetUserByEmail(user.Email)
 	if err != nil {
-		return "", "", "", errors.New("User not found")
+		return "", "", errors.New("User not found")
 	}
 	if err := bc.CheckPasswordHash(user.Password, myUser.Password); err != nil {
-		return "", "", "", errors.New("Invalid password")
+		return "", "", errors.New("Invalid password")
 	}
-	refreshToken = jwt.CreateRefresh(myUser.Email)
-	accessToken = jwt.CreateAccess(myUser.ID.Hex(), myUser.Name, myUser.Email)
-	err = s.repo.Users.SetNewRefreshToken(myUser.Email, refreshToken)
-	if err != nil {
-		return "", "", "", errors.New("Error setting refresh token")
-	}
-	return myUser.Name, refreshToken,accessToken, nil
+	
+	token = jwt.Create(myUser.ID.Hex(), myUser.Name, myUser.Email)
+	return myUser.Name,token, nil
 }
 
-func (s *Service) Getme(email string) (name string, accessToken string , err error) {
-	user, err := s.repo.Users.GetUserByEmail(email)
+func (s *Service) Getme(userId string) (user m.RegisterResponse , err error) {
+	user, err = s.repo.Users.GetOneByID(userId)
 	if err != nil {
-		return  "", "", errors.New("User not found")
+		return  m.RegisterResponse{},  errors.New("User not found")
 	}
-	accessToken = jwt.CreateAccess(user.ID.Hex(), user.Name, user.Email)
-	return  user.Name, accessToken, nil
+	
+	return  user, nil
 }

@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"tap/internal/libs/jwt"
 	v "tap/internal/libs/validate"
 	m "tap/internal/models"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -23,25 +21,20 @@ func (h *Handler) Register( c *fiber.Ctx) error {
 		})
 	}
 
-	refreshToken , accessToken, err := h.service.Register(user)
+	token, err := h.service.Register(user)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": err.Error(),
 			"user": user,
 		})
 	}
-	c.Set("access_token", accessToken)
+	c.Set("Authorization", token)
 
-	c.Cookie(&fiber.Cookie{
-		Name:     "refresh_token",
-		Value:    refreshToken,
-		Expires:  time.Now().Add(time.Hour * 24 * 30),
-		HTTPOnly: true,
-	})
 
 	return c.JSON(fiber.Map{
 		"email": user.Email,
 		"name": user.Name,
+		"Authorization": token,
 	})
 }
 
@@ -61,55 +54,48 @@ func (h *Handler) Login( c *fiber.Ctx) error {
 	}
 
 
-	name, refreshToken, accessToken, err := h.service.Login(user)
+	name, token, err := h.service.Login(user)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
 
-	c.Set("token", "sdsdsd")
 
-	c.Cookie(&fiber.Cookie{
-		Name:     "access_token",
-		Value:    accessToken,
-		Expires:  time.Now().Add(time.Hour),
-		HTTPOnly: true,
-	})
 
-	c.Set("Authorization", accessToken)
 
-	c.Cookie(&fiber.Cookie{
-		Name:     "refresh_token",
-		Value:    refreshToken,
-		Expires:  time.Now().Add(time.Hour * 24 * 30),
-		HTTPOnly: true,
-	})
+	c.Set("Authorization", token)
+
 
 	return c.JSON(fiber.Map{
 		"email": user.Email,
 		"name": name,
+		"Authorization": token,
 	})
 }
 
 func (h *Handler) Getme( c *fiber.Ctx) error {
-	refreshToken := c.Cookies("refresh_token")
-	claims , err := jwt.VerifyRefresh(refreshToken)
-	if err != nil {
+	userId, ok := c.Locals("user_id").(string)
+	if !ok {
 		return c.Status(400).JSON(fiber.Map{
-			"message": "Invalid token",
+			"message": "Unauthorized",
 		})
 	}
-	name, accessToken, err := h.service.Getme(claims.Email)
+	if userId == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "Unauthorized",
+		})
+	}
+	user, err := h.service.Getme(userId)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": err,
 		})
 	}
-	c.Set("access_token", accessToken)
-	return c.JSON(fiber.Map{
-		"email": claims.Email,
-		"name": name,
+	return c.JSON(&fiber.Map{
+		"email": user.Email,
+		"name": user.Name,
+		"isemailverified": user.IsEmailVerified,
 	})
 }
 

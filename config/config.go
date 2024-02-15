@@ -91,7 +91,7 @@ func InitConfig() error {
 		client: client,
 		google: &Google{
 			config: googleConfig,
-			state: "random",
+			state: "something",
 		},
 	}
 	return nil

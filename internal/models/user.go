@@ -19,7 +19,6 @@ type RegisterResponse struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	Password string `json:"password"`
-	RefreshToken string `json:"refreshtoken"`
 	IsEmailVerified bool `json:"isemailverified"`
 	VerifyCode string `json:"verifycode"`
 }

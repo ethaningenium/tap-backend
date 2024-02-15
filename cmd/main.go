@@ -30,22 +30,13 @@ func main() {
 	app.Use(logger.New(logger.Config{
     Format: "[${ip}]:${port} ${status} - ${method} ${path} ${latency}\n",
 	}))
+	fmt.Print(config.ClientHome())
 	app.Use(cors.New(cors.Config{
-    AllowOrigins: "http://localhost:9000",
-		AllowHeaders: "*",
-		ExposeHeaders: "*",
-		MaxAge: 24 * 60 * 60,
+    AllowOrigins: config.ClientHome(),
+		AllowHeaders: "Origin, Content-Type, Accept,Authorization",
 		AllowCredentials: true,
-		AllowMethods: "HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS",
+		AllowMethods: "*",
 	}))
-
-	app.Use (func(c *fiber.Ctx) error {
-		c.Set("X-Powered-By", "Fiber")
-		if c.Method() == "OPTIONS" {
-			return c.SendStatus(fiber.StatusNoContent)
-		}
-		return c.Next()
-	})
 
 	// Connect to MongoDB
 	connectionUrl := config.ConnectionUrl()

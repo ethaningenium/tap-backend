@@ -7,13 +7,14 @@ import (
 )
 
 func Auth(c *fiber.Ctx) error {
-	accessToken := c.Get("access_token")
+	accessToken := c.Get("Authorization")
 	if accessToken == "" {
 		return c.Status(401).JSON(fiber.Map{
 			"message": "Unauthorized",
 		})
 	}
-	claims, err := jwt.VerifyAccess(accessToken)
+	
+	claims, err := jwt.Verify(accessToken)
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{
 			"message": err.Error(),
