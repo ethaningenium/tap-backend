@@ -54,7 +54,7 @@ func InitConfig() error {
 	if err != nil {
 		err = godotenv.Load(".env")
 		if err != nil {
-			return errors.New("Error loading .env file")
+			return errors.New("error loading .env file")
 		}
 	}
 	app := &App{

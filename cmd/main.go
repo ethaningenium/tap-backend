@@ -31,14 +31,13 @@ func main() {
     Format: "[${ip}]:${port} ${status} - ${method} ${path} ${latency}\n",
 	}))
 	app.Use(cors.New(cors.Config{
-    AllowOrigins: "*",
+    AllowOrigins: "http://localhost:9000",
 		AllowHeaders: "*",
 		ExposeHeaders: "*",
 		MaxAge: 24 * 60 * 60,
 		AllowCredentials: true,
-		AllowMethods: "HEAD, GET, POST, PUT, PATCH, DELETE",
-		
-}))
+		AllowMethods: "HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS",
+	}))
 
 	app.Use (func(c *fiber.Ctx) error {
 		c.Set("X-Powered-By", "Fiber")
