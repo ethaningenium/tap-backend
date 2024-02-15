@@ -25,12 +25,7 @@ func (s *Service) AuthGoogle(googleToken string) (token string, err error) {
 	}
 
 	oldUser,err := s.repo.Users.GetUserByEmail(user["email"].(string))
-	if err != nil {
-		if err.Error() != "user not found"{
-			return  "", err
-		}
-	}
-	if oldUser.ID.Hex() != "" {
+	if err == nil {
 		token = jwt.Create(oldUser.ID.Hex(), user["email"].(string), user["name"].(string))
 		return token, nil
 	}
