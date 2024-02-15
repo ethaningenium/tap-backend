@@ -29,6 +29,6 @@ func (h *Handler) AuthGoogleCallback (ctx *fiber.Ctx) error {
 		return ctx.Redirect(config.ClientHome(), fiber.StatusMovedPermanently)
 	}
 	
-	return ctx.Redirect(fmt.Sprintf("%s?token=%s", config.ClientHome(), token), fiber.StatusMovedPermanently)
+	return ctx.Redirect(fmt.Sprintf("%s/google/calback?token=%s", config.ClientHome(), token), fiber.StatusMovedPermanently)
 }
 
