@@ -2,4 +2,4 @@ run:
 	go run cmd/main.go
 
 xpr:
-	go run exp/run.go
+	go run xpr/main.go
