@@ -61,3 +61,28 @@ func (h *Handler) UpdatePage(c *fiber.Ctx) error {
 	return c.JSON(page)
 
 }
+
+func (h *Handler) GetPages(c *fiber.Ctx) error {
+	userId := c.Locals("user_id").(string)
+	pages, err := h.service.GetPages(userId)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(pages)
+}
+
+func (h *Handler) CheckAddress(c *fiber.Ctx) error {
+	address := c.Params("check")
+
+	exists, err := h.service.CheckAddress(address)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"exists": exists,
+	})
+}

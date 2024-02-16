@@ -17,10 +17,11 @@ func SetupRoutes (app *fiber.App, handlers *handlers.Handler) {
 	app.Post("/register", handlers.Register)
 	app.Post("/login", handlers.Login)
 	app.Get("/me",middle.Auth, handlers.Getme)
-	
+	app.Get("/page",middle.Auth, handlers.GetPages)
 	app.Get("/page/:address", handlers.GetPage)
 	app.Post("/page", middle.Auth,  handlers.CreatePage)
 	app.Put("/page", middle.Auth, handlers.UpdatePage)
+	app.Get("/address/:check", handlers.CheckAddress)
 	app.Get("/verify/:id", handlers.VerifyEmail)
 	app.Post("/email", handlers.SendEmail)
 	app.Get("/auth/google", handlers.AuthGoogle)

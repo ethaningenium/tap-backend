@@ -30,7 +30,6 @@ func main() {
 	app.Use(logger.New(logger.Config{
     Format: "[${ip}]:${port} ${status} - ${method} ${path} ${latency}\n",
 	}))
-	fmt.Print(config.ClientHome())
 	app.Use(cors.New(cors.Config{
     AllowOrigins: config.ClientHome(),
 		AllowHeaders: "Origin, Content-Type, Accept,Authorization",

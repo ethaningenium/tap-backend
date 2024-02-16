@@ -5,6 +5,19 @@ import (
 	m "tap/internal/models"
 )
 
+func (s *Service) CheckAddress(address string) (bool, error) {
+	return s.repo.Pages.CheckAddressExists(address)
+}
+
+func (s *Service) GetPages(userId string) ([]m.PageRequest, error) {
+	userIdobject , err := primitive.GetObject(userId)
+	if err != nil {
+		return nil, err
+	}
+	
+	return s.repo.Pages.GetAll(userIdobject)
+}
+
 func (s *Service) GetPageByAddress(address string) (m.PageRequest, error) {
 	return s.repo.Pages.GetByAddress(address)
 }

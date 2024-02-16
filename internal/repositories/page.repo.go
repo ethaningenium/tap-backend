@@ -45,6 +45,18 @@ func NewPageRepo(db *mongo.Database) *PageRepo {
 	}
 }
 
+func (repo *PageRepo) GetAll( userID primitive.ObjectID ) ([]m.PageRequest, error) {
+	var pages []m.PageRequest
+	cursor, err := repo.Find(context.Background(), bson.M{"user_id": userID})
+	if err != nil {
+		return nil, err
+	}
+	if err = cursor.All(context.Background(), &pages); err != nil {
+		return nil, err
+	}
+	return pages, nil
+}
+
 func (repo *PageRepo) CreateNewPage( page m.PageRequest ) error {
 	_, err := repo.InsertOne(context.Background(), page)
 		if err != nil {
@@ -97,4 +109,24 @@ func (repo *PageRepo) GetByAddress( address string ) (m.PageRequest, error) {
 		return m.PageRequest{}, err
 	}
 	return page, nil
+}
+
+func(repo *PageRepo) CheckAddressExists(address string) (bool, error) {
+	
+	ctx := context.TODO()
+
+	// Поиск документа с заданным адресом
+	filter := bson.M{"address": address}
+	var result m.PageRequest
+	err := repo.FindOne(ctx, filter).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+			// Документ с таким адресом не найден
+			return false, nil
+	} else if err != nil {
+			// Произошла ошибка при выполнении запроса к базе данных
+			return false, err
+	}
+
+	// Документ с таким адресом найден
+	return true, nil
 }
