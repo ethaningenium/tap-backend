@@ -31,7 +31,7 @@ func main() {
     Format: "[${ip}]:${port} ${status} - ${method} ${path} ${latency}\n",
 	}))
 	app.Use(cors.New(cors.Config{
-    AllowOrigins: config.ClientHome(),
+    AllowOrigins: fmt.Sprintf("%s, http://localhost:3000,  http://192.168.178.21:3000",config.ClientHome()),
 		AllowHeaders: "Origin, Content-Type, Accept,Authorization",
 		AllowCredentials: true,
 		AllowMethods: "*",
