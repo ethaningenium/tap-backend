@@ -31,6 +31,8 @@ func (s *Service) CreatePage(page m.PageFromBody, userId string) error {
 		ID: page.ID,
 		Title: page.Title,
 		Address: page.Address,
+		Theme: page.Theme,
+		Favicon: page.Favicon,
 		Bricks: page.Bricks,
 		User: HexId,
 	}
@@ -47,6 +49,8 @@ func (s *Service) UpdatePage(page m.PageFromBody, userId string) error {
 		ID: page.ID,
 		Title: page.Title,
 		Address: page.Address,
+		Theme: page.Theme,
+		Favicon: page.Favicon,
 		Bricks: page.Bricks,
 		User: HexId,
 	}
