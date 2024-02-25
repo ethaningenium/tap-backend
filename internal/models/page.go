@@ -13,6 +13,17 @@ type PageFromBody struct {
 	Bricks []Brick `json:"bricks" bson:"bricks"`
 }
 
+type PageMetaData struct {
+	ID string `json:"id" bson:"page_id"`
+	Title string `json:"title" bson:"title"`
+	Theme string `json:"theme" bson:"theme"`
+	Favicon string `json:"favicon" bson:"favicon"`
+	Address string `json:"address" bson:"address"`
+	User primitive.ObjectID `json:"user" bson:"user_id"`
+}
+
+
+
 
 type PageRequest struct {
 	ID string `json:"id" bson:"page_id"`

@@ -4,6 +4,7 @@ import (
 	m "tap/internal/models"
 
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 
@@ -60,6 +61,31 @@ func (h *Handler) UpdatePage(c *fiber.Ctx) error {
 	}
 	return c.JSON(page)
 
+}
+
+func (h *Handler) UpdateMeta(c *fiber.Ctx) error {
+	var page m.PageMetaData
+	if err := c.BodyParser(&page); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "Error parsing body",
+		}) 
+	}
+
+	userId := c.Locals("user_id").(string)
+	newId, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	page.User = newId
+	err = h.service.UpdatePageMeta(page, userId)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(page)
 }
 
 func (h *Handler) GetPages(c *fiber.Ctx) error {

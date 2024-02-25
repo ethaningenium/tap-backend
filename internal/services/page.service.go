@@ -57,3 +57,7 @@ func (s *Service) UpdatePage(page m.PageFromBody, userId string) error {
 	
 	return s.repo.Pages.UpdatePage(requestPage)
 }
+
+func (s *Service) UpdatePageMeta(page m.PageMetaData, userId string) error {
+	return s.repo.Pages.UpdatePageMeta(page)
+}

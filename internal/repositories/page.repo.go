@@ -68,7 +68,15 @@ func (repo *PageRepo) CreateNewPage( page m.PageRequest ) error {
 func (repo *PageRepo) UpdatePage( page m.PageRequest ) error {
 	_, err := repo.UpdateOne(context.Background(), bson.M{"page_id": page.ID}, bson.M{"$set": page})
 		if err != nil {
-				return errors.New("Error on update page")
+				return errors.New("error on update page")
+		}
+	return nil
+}
+
+func (repo *PageRepo) UpdatePageMeta( page m.PageMetaData ) error {
+	_, err := repo.UpdateOne(context.Background(), bson.M{"page_id": page.ID}, bson.M{"$set": page})
+		if err != nil {
+				return errors.New("error on update page")
 		}
 	return nil
 }
@@ -97,7 +105,7 @@ func (repo *PageRepo) GetPageByID( pageID string ) (m.PageRequest, error) {
 func (repo *PageRepo) DeletePage( pageID string ) error {
 	_, err := repo.DeleteOne(context.Background(), bson.M{"page_id": pageID})
 		if err != nil {
-				return errors.New("Error on delete page")
+				return errors.New("error on delete page")
 		}
 	return nil
 }
