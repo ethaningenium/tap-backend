@@ -66,7 +66,7 @@ func (repo *PageRepo) CreateNewPage( page m.PageRequest ) error {
 }
 
 func (repo *PageRepo) UpdatePage( page m.PageRequest ) error {
-	_, err := repo.UpdateOne(context.Background(), bson.M{"page_id": page.ID}, bson.M{"$set": page})
+	_, err := repo.UpdateOne(context.Background(), bson.M{"page_id": page.ID, "user_id": page.User}, bson.M{"$set": page})
 		if err != nil {
 				return errors.New("error on update page")
 		}

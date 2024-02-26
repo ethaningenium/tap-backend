@@ -41,9 +41,9 @@ func (repo *UserRepo) CreateNewUser( user m.RegisterResponse )  (string ,error) 
 	_ , err := repo.InsertOne(context.Background(), user)
   if err != nil {
 		if mongo.IsDuplicateKeyError(err){
-			return "", errors.New("User already exists")
+			return "", errors.New("user already exists")
 		}
-    return "", errors.New("Error on create user")
+    return "", errors.New("error on create user")
   }
 	
 	return user.ID.Hex(), nil
