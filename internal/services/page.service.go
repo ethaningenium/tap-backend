@@ -40,22 +40,9 @@ func (s *Service) CreatePage(page m.PageFromBody, userId string) error {
 	return s.repo.Pages.CreateNewPage(requestPage)
 }
 
-func (s *Service) UpdatePage(page m.PageFromBody, userId string) error {
-	HexId, err := primitive.GetObject(userId)
-	if err != nil {
-		return err
-	}
-	requestPage := m.PageRequest{
-		ID: page.ID,
-		Title: page.Title,
-		Address: page.Address,
-		Theme: page.Theme,
-		Favicon: page.Favicon,
-		Bricks: page.Bricks,
-		User: HexId,
-	}
+func (s *Service) UpdatePage(page m.PageRequest) error {
 	
-	return s.repo.Pages.UpdatePage(requestPage)
+	return s.repo.Pages.UpdatePage(page)
 }
 
 func (s *Service) UpdatePageMeta(page m.PageMetaData, userId string) error {
