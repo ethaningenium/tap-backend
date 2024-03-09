@@ -1,8 +1,9 @@
 package services
 
 import (
-	"tap/internal/libs/primitive"
 	m "tap/internal/models"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (s *Service) CheckAddress(address string) (bool, error) {
@@ -10,7 +11,8 @@ func (s *Service) CheckAddress(address string) (bool, error) {
 }
 
 func (s *Service) GetPages(userId string) ([]m.PageRequest, error) {
-	userIdobject , err := primitive.GetObject(userId)
+	
+	userIdobject , err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +25,7 @@ func (s *Service) GetPageByAddress(address string) (m.PageRequest, error) {
 }
 
 func (s *Service) CreatePage(page m.PageFromBody, userId string) error {
-	HexId, err := primitive.GetObject(userId)
+	HexId, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return err
 	}
@@ -43,6 +45,14 @@ func (s *Service) CreatePage(page m.PageFromBody, userId string) error {
 func (s *Service) UpdatePage(page m.PageRequest) error {
 	
 	return s.repo.Pages.UpdatePage(page)
+}
+
+func (s *Service) DeletePage(address string, userId string) error {
+	HexId, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return err
+	}
+	return s.repo.Pages.DeletePage(address, HexId)
 }
 
 func (s *Service) UpdatePageMeta(page m.PageMetaData, userId string) error {

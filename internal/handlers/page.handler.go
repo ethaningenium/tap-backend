@@ -125,6 +125,11 @@ func (h *Handler) UpdateMeta(c *fiber.Ctx) error {
 
 func (h *Handler) GetPages(c *fiber.Ctx) error {
 	userId := c.Locals("user_id").(string)
+	if userId == "" {
+		return c.Status(500).JSON(fiber.Map{
+			"message": "User ID not found",
+		})
+	}
 	pages, err := h.service.GetPages(userId)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -145,5 +150,19 @@ func (h *Handler) CheckAddress(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{
 		"exists": exists,
+	})
+}
+
+func (h *Handler) DeletePage(c *fiber.Ctx) error {
+	address := c.Params("address")
+	userId := c.Locals("user_id").(string)
+	err := h.service.DeletePage(address, userId)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"message": "deleted",
 	})
 }

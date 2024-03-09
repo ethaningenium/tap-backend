@@ -102,11 +102,16 @@ func (repo *PageRepo) GetPageByID( pageID string ) (m.PageRequest, error) {
 	return page, nil
 }
 
-func (repo *PageRepo) DeletePage( pageID string ) error {
-	_, err := repo.DeleteOne(context.Background(), bson.M{"page_id": pageID})
-		if err != nil {
-				return errors.New("error on delete page")
-		}
+func (repo *PageRepo) DeletePage( address string, userID primitive.ObjectID ) error {
+	
+	filter := bson.D{
+		{"address", address},
+		{"user_id", userID},
+	}
+	err := repo.FindOneAndDelete(context.Background(), filter)
+	if err != nil {
+		return err.Err()
+	}
 	return nil
 }
 

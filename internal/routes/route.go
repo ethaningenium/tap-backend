@@ -19,6 +19,7 @@ func SetupRoutes (app *fiber.App, handlers *handlers.Handler) {
 	app.Get("/me",middle.Auth, handlers.Getme)
 	app.Get("/page",middle.Auth, handlers.GetPages)
 	app.Get("/page/:address", handlers.GetPage)
+	app.Delete("/page/:address", middle.Auth, handlers.DeletePage)
 	app.Post("/page", middle.Auth,  handlers.CreatePage)
 	app.Put("/page", middle.Auth, handlers.UpdatePage)
 	app.Patch("/page", middle.Auth, handlers.UpdateMeta)
