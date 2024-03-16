@@ -5,13 +5,15 @@ import (
 )
 
 type Repository struct {
-	Users *UserRepo
-	Pages *PageRepo
+	Users   *UserRepo
+	Pages   *PageRepo
+	Metrics *MetricRepo
 }
 
 func NewRepository(db *mongo.Database) *Repository {
 	return &Repository{
-		Users: NewUserRepo(db),
-		Pages: NewPageRepo(db),
+		Users:   NewUserRepo(db),
+		Pages:   NewPageRepo(db),
+		Metrics: NewMetricRepo(db),
 	}
 }

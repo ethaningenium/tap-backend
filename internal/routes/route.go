@@ -9,18 +9,18 @@ import (
 )
 
 type User struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func SetupRoutes (app *fiber.App, handlers *handlers.Handler) {
+func SetupRoutes(app *fiber.App, handlers *handlers.Handler) {
 	app.Post("/register", handlers.Register)
 	app.Post("/login", handlers.Login)
-	app.Get("/me",middle.Auth, handlers.Getme)
-	app.Get("/page",middle.Auth, handlers.GetPages)
+	app.Get("/me", middle.Auth, handlers.Getme)
+	app.Get("/page", middle.Auth, handlers.GetPages)
 	app.Get("/page/:address", handlers.GetPage)
 	app.Delete("/page/:address", middle.Auth, handlers.DeletePage)
-	app.Post("/page", middle.Auth,  handlers.CreatePage)
+	app.Post("/page", middle.Auth, handlers.CreatePage)
 	app.Put("/page", middle.Auth, handlers.UpdatePage)
 	app.Patch("/page", middle.Auth, handlers.UpdateMeta)
 	app.Get("/address/:check", handlers.CheckAddress)
@@ -28,6 +28,9 @@ func SetupRoutes (app *fiber.App, handlers *handlers.Handler) {
 	app.Post("/email", handlers.SendEmail)
 	app.Get("/auth/google", handlers.AuthGoogle)
 	app.Get("/auth/google/callback", handlers.AuthGoogleCallback)
+	app.Get("metric/visit/:pageId", handlers.VisitMetric)
+	app.Get("metric/user/:pageId", handlers.UserMetric)
+	app.Post("metric/click/:pageId", handlers.ClickMetric)
 
 	app.Get("/test", func(c *fiber.Ctx) error {
 		c.Cookie(&fiber.Cookie{
